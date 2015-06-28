@@ -46,6 +46,6 @@ These are the standard features of PEDA:
 
 ## Installation
 
-    git clone https://github.com/zachriggle/peda.git ~/peda
+    git clone https://github.com/0xItx/peda.git ~/peda
     echo "source ~/peda/peda.py" >> ~/.gdbinit
     echo "DONE! debug your program with gdb and enjoy"
