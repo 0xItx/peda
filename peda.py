@@ -4865,7 +4865,7 @@ class PEDACmd(object):
                     text += format_reference_chain(chain)
                     text += "\n"
             if text:
-                msg(encode(text.strip(), 'utf-8', 'ignore'))
+                msg(text.strip())
             if regname is None or "eflags" in regname:
                 self.eflags()
             return
