@@ -43,7 +43,7 @@ from utils import *
 import config
 from nasm import *
 
-ARM_REGS = ['sp'] + list(map(lambda x: "r%i" % x, range(32))) + ['cpsr']
+ARM_REGS = list(map(lambda x: "r%i" % x, range(32))) + ['sp', 'lr', 'pc', 'cpsr']
 
 REGISTERS = {
     8 : ["al", "ah", "bl", "bh", "cl", "ch", "dl", "dh"],
@@ -411,7 +411,7 @@ class PEDA(object):
         """
 
         try:
-            return gdb.selected_inferior().pid
+            return int(gdb.selected_inferior().pid)
         except:
             return None
 
@@ -680,10 +680,14 @@ class PEDA(object):
             filename = self.get_session_filename()
 
         # exec-wrapper
-        out = self.execute_redirect("show exec-wrapper")
-        wrapper = out.split('"')[1]
-        if wrapper:
-            session += "set exec-wrapper %s\n" % wrapper
+        try:
+            out = self.execute_redirect("show exec-wrapper")
+            wrapper = out.split('"')[1]
+            if wrapper:
+                session += "set exec-wrapper %s\n" % wrapper
+        except:
+            # Some versions of GDB do not have exec-wrapper at all
+            pass
 
         try:
             # save breakpoints
@@ -925,7 +929,7 @@ class PEDA(object):
 
         return result
 
-    def _get_function_args_32(self, code, argc=None):
+    def _get_function_args_x86(self, code, argc=None):
         """
         Guess the number of arguments passed to a function - i386
         """
@@ -956,7 +960,7 @@ class PEDA(object):
 
         return args
 
-    def _get_function_args_64(self, code, argc=None):
+    def _get_function_args_x64(self, code, argc=None):
         """
         Guess the number of arguments passed to a function - x86_64
         """
@@ -1024,9 +1028,12 @@ class PEDA(object):
             code = "0x%x:%s\n" % (addr, inst) + code
 
         if "i386" in arch:
-            args = self._get_function_args_32(code, argc)
-        if "64" in arch:
-            args = self._get_function_args_64(code, argc)
+            args = self._get_function_args_x86(code, argc)
+        elif "x86-64" in arch:
+            args = self._get_function_args_x64(code, argc)
+        elif "arm" in arch:
+            # TODO: ARM argument parsing
+            pass
 
         return args
 
@@ -6121,6 +6128,8 @@ peda.execute("set follow-fork-mode child")
 peda.execute("set backtrace past-main on")
 peda.execute("set step-mode on")
 peda.execute("set print pretty on")
+peda.execute("set print demangle on")
+peda.execute("set print asm-demangle on")
 peda.execute("set width 0")
 peda.execute("set print elements 15")
 peda.execute("handle SIGALRM print nopass") # ignore SIGALRM
