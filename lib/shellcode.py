@@ -287,10 +287,10 @@ class Shellcode():
             return None
         try:
             msg("Connecting to shell-storm.org...")
-            s = http.client.HTTPConnection("shell-storm.org")
+            s = httplib.HTTPConnection("shell-storm.org")
             s.request("GET", "/api/?s="+str(keyword))
             res = s.getresponse()
-            data_l = res.read().split('\n')
+            data_l = decode(res.read()).split('\n')
         except:
             error_msg("Cannot connect to shell-storm.org")
             return None
@@ -318,7 +318,7 @@ class Shellcode():
 
         try:
             msg("Connecting to shell-storm.org...")
-            s = http.client.HTTPConnection("shell-storm.org")
+            s = httplib.HTTPConnection("shell-storm.org")
         except:
             error_msg("Cannot connect to shell-storm.org")
             return None
@@ -326,7 +326,7 @@ class Shellcode():
         try:
             s.request("GET", "/shellcode/files/shellcode-"+str(shellcodeId)+".php")
             res = s.getresponse()
-            data = res.read().split("<pre>")[1].split("<body>")[0]
+            data = decode(res.read()).split("<pre>")[1].split("<body>")[0]
         except:
             error_msg("Failed to download shellcode from shell-storm.org")
             return None

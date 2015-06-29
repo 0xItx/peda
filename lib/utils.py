@@ -29,6 +29,9 @@ except: from io       import StringIO # Python3
 try:    unicode
 except: unicode = str
 
+try: input = raw_input
+except: pass
+
 # http://wiki.python.org/moin/PythonDecoratorLibrary#Memoize
 # http://stackoverflow.com/questions/8856164/class-decorator-decorating-method-in-python
 class memoized(object):

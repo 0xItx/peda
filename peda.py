@@ -22,12 +22,9 @@ import traceback
 import collections
 from codecs import encode, decode
 try:
-    import pickle as pickle
+    import cPickle as pickle
 except:
     import pickle
-
-# if sys.version[0] != "3":
-    # raise Exception("Python2 is not supported at the moment, upgrade your GDB or use http://github.com/longld/peda")
 
 bytes = encode
 
