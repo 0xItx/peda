@@ -3032,15 +3032,27 @@ class PEDACmd(object):
         gdb.selected_inferior().write_memory(addr, bytes)
 
     def eb(self, where, *bytes):
-        """Edits bytes"""
+        """
+        Edit memory content
+        Usage:
+            MYNAME address <list of hex-encoded bytes>
+        """
         self._eX(where, bytes, 1)
 
     def ew(self, where, *bytes):
-        """Edits shorts"""
+        """
+        Edit memory content
+        Usage:
+            MYNAME address <list of hex-encoded words>
+        """
         self._eX(where, bytes, 2)
 
     def ed(self, where, *bytes):
-        "docs"
+        """
+        Edit memory content
+        Usage:
+            MYNAME address <list of hex-encoded dwords>
+        """
         self._eX(where, bytes, 4)
 
     def reload(self, *arg):
