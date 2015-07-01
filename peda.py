@@ -3015,13 +3015,9 @@ class PEDACmd(object):
         Check if program is running, for internal use
         """
         pid = peda.getpid()
-        if pid is None:
-            text = "not running or target is remote"
-            warning_msg(text)
-            return None
-            #raise Exception(text)
-        else:
-            return pid
+        if not pid:
+            warning_msg("not running or target is remote")
+        return pid
 
     def _eX(self, where, bytes, size):
         addr  = to_int(where)
@@ -4130,7 +4126,7 @@ class PEDACmd(object):
 
         binname = peda.getfile()
         if binname is None:
-            filename = peda.getpid() # file to write trace log
+            filename = str(peda.getpid())  # file to write trace log
         else:
             filename = os.path.basename(binname)
 
