@@ -4989,6 +4989,19 @@ class PEDACmd(object):
                 msg("%s = 0x%x" % (k, start))
         return
 
+    # elfentry()
+    def elfentry(self):
+        """
+        Get entry point from debugged ELF file
+        Usage:
+            MYNAME
+        """
+        entry = peda.elfentry()
+        if entry:
+            msg(hex(entry))
+        else:
+            msg("No entry point found in `info files`")
+
     # readelf_header(), elfheader_solib()
     def readelf(self, *arg):
         """
