@@ -4635,8 +4635,11 @@ class PEDACmd(object):
             MYNAME pattern start end
             MYNAME pattern mapname
         """
-        (pattern, start, end) = normalize_argv(arg, 3)
-        (pattern, mapname) = normalize_argv(arg, 2)
+        if len(arg) >= 3:
+            (pattern, start, end) = normalize_argv(arg, 3)
+        else:
+            (pattern, mapname) = normalize_argv(arg, 2)
+
         if pattern is None:
             self._missing_argument()
 
