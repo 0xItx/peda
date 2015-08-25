@@ -373,6 +373,23 @@ class PEDA(object):
 
         return result
 
+    def getcore(self):
+        """
+        Get current core file, if there is one
+
+        Returns:
+            - full path to core file (String) or None
+        """
+        result = None
+        out = self.execute_redirect('info files')
+        if out and '"' in out:
+            p = re.compile("core dump file:\s*`(.*)'")
+            m = p.search(out)
+            if m:
+                result = m.group(1)
+
+        return result
+
     def get_status(self):
         """
         Get execution status of debugged program
@@ -1486,12 +1503,13 @@ class PEDA(object):
                     maps += [(start, end, perm, mapname)]
             return maps
 
+        # Don't use /proc for coredumps
+        if self.getcore() or not self.getpid():
+            return _get_offline_maps()
+
         result = []
         pid = self.getpid()
         tid = self.gettid()
-        if not pid or not tid: # not running, try to use elfheader()
-            return _get_offline_maps()
-
 
         # retrieve all maps
         os   = self.getos()
@@ -1501,7 +1519,7 @@ class PEDA(object):
             if   os == "FreeBSD": maps = _get_allmaps_freebsd(pid, tid, rmt)
             elif os == "Linux" :   maps = _get_allmaps_linux(pid, tid, rmt)
         except Exception as e:
-            if config.Option.get("debug") == "on":
+            if config.Option.get("debug"):
                 msg("Exception: %s" %e)
                 traceback.print_exc()
 
@@ -2226,7 +2244,7 @@ class PEDA(object):
         """
         elfinfo = {}
         elfbase = 0
-        if self.getpid():
+        if self.getpid() and not self.getcore():
             binmap = self.get_vmmap("binary")
             elfbase = binmap[0][0] if binmap else 0
 
@@ -3561,6 +3579,20 @@ class PEDACmd(object):
             msg("No file specified")
         else:
             msg(filename)
+        return
+
+    # getcore()
+    def getcore(self):
+        """
+        Get path of current core file
+        Usage:
+            MYNAME
+        """
+        corename = peda.getcore()
+        if corename == None:
+            msg("No core file")
+        else:
+            msg(corename)
         return
 
     # getpid()
@@ -4980,7 +5012,7 @@ class PEDACmd(object):
             MYNAME [header_name]
         """
 
-        (name,) = normalize_argv(arg, 1)
+        (name,) = normalize_argv(arg, 1, False)
         result = peda.elfheader(name)
         if len(result) == 0:
             warning_msg("%s not found, did you specify the FILE to debug?" % (name if name else "headers"))
@@ -6135,6 +6167,7 @@ Alias("jtrace", "peda traceinst j")
 Alias("stack", "peda telescope $sp")
 Alias("viewmem", "peda telescope")
 Alias("reg", "peda xinfo register")
+Alias("ctx", "peda context")
 
 # misc gdb settings
 peda.execute("set confirm off")
