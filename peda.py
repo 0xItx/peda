@@ -4671,6 +4671,7 @@ class PEDACmd(object):
             (pattern, start, end) = normalize_argv(arg, 3)
         else:
             (pattern, mapname) = normalize_argv(arg, 2)
+            start, end = None, None
 
         if pattern is None:
             self._missing_argument()
