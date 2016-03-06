@@ -4828,7 +4828,7 @@ class PEDACmd(object):
                 regsList[chain[0][0]] = regslist
 
         for chain in result:
-            text += "%02d:%04d| %s" % (idx/step, idx, regsList[chain[0][0]] + " "*(regsColumnLen-len(regsList[chain[0][0]])) if chain[0][0] in regsList else " "*regsColumnLen)
+            text += "%02d:%04x| %s" % (idx/step, idx, regsList[chain[0][0]] + " "*(regsColumnLen-len(regsList[chain[0][0]])) if chain[0][0] in regsList else " "*regsColumnLen)
             text += format_reference_chain(chain)
             text += "\n"
             idx += step
