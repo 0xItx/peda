@@ -40,12 +40,17 @@ from utils import *
 import config
 from nasm import *
 
-ARM_REGS = list(map(lambda x: "r%i" % x, range(32))) + ['sp', 'lr', 'pc', 'cpsr']
+ARM_REGS  = list(map(lambda x: "r%i" % x, range(32))) + ['sp', 'lr', 'pc', 'cpsr']
+MIPS_REGS = ['zero', 'at', 'v0', 'v1', 'a0', 'a1', 'a2', 'a3',
+             't0', 't1', 't2', 't3', 't4', 't5', 't6', 't7',
+             's0', 's1', 's2', 's3', 's4', 's5', 's6', 's7',
+             't8', 't9', 'k0', 'k1', 'gp', 'sp', 's8', 'ra',
+             'status', 'lo', 'hi', 'badvaddr', 'cause', 'pc', 'fcsr', 'fir', 'restart']
 
 REGISTERS = {
     8 : ["al", "ah", "bl", "bh", "cl", "ch", "dl", "dh"],
     16: ["ax", "bx", "cx", "dx"],
-    32: ["eax", "ebx", "ecx", "edx", "esi", "edi", "ebp", "esp", "eip"] + ARM_REGS,
+    32: ["eax", "ebx", "ecx", "edx", "esi", "edi", "ebp", "esp", "eip"] + ARM_REGS + MIPS_REGS,
     64: ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "rbp", "rsp", "rip"] + ARM_REGS
 }
 
@@ -494,15 +499,18 @@ class PEDA(object):
         if reglist:
             reglist = reglist.replace(",", " ")
         else:
-            reglist = ""
+            if peda.getarch()[0].endswith('mips'):  # Ugly hack to deal with mips-gdb's unusual tabular display
+                reglist = ' '.join(MIPS_REGS)
+            else:
+                reglist = ""
         regs = self.execute_redirect("info registers %s" % reglist)
         if not regs:
             return None
 
         result = {}
         if regs:
-            for r in regs.splitlines():
-                r = r.split()
+            for reg_line in regs.splitlines():
+                r = [word for word in re.split('\W+', reg_line) if word]
                 if len(r) > 1 and to_int(r[1]) is not None:
                     result[r[0]] = to_int(r[1])
         return result
