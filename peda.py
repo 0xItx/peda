@@ -6198,6 +6198,6 @@ peda.execute("set print pretty on")
 peda.execute("set print demangle on")
 peda.execute("set print asm-demangle on")
 peda.execute("set width 0")
-peda.execute("set print elements 15")
+peda.execute("set print elements 0")
 peda.execute("handle SIGALRM print nopass") # ignore SIGALRM
 peda.execute("handle SIGSEGV stop print nopass") # catch SIGSEGV
