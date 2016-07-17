@@ -4533,8 +4533,8 @@ class PEDACmd(object):
                     data += eval("%s" % input)
 
         if to_int(data) is not None:
-            data = hex2str(to_int(data), peda.instsize())
-        data = data.replace("\\\\", "\\")
+            data = hex2str(to_int(data))
+        data = decode(data, 'string_escape')
         if end_address:
             data = data*((end_address-address+1)/len(data))
         bytes = peda.writemem(address, data)
@@ -6186,7 +6186,7 @@ Alias("ctx", "peda context")
 peda.execute("set confirm off")
 peda.execute("set verbose off")
 peda.execute("set output-radix 0x10")
-peda.execute("set prompt \033[31mgdb-peda$\033[0m ") # custom prompt
+# peda.execute("set prompt \033[31mgdb-peda$\033[0m ") # custom prompt
 peda.execute("set height 0") # disable paging
 peda.execute("set history expansion on")
 peda.execute("set history save on") # enable history saving
