@@ -526,6 +526,9 @@ def split_disasm_line(line):
 
     return p,int(a,16),n,i,(c or None)
 
+def match_source_line(line):
+    return re.match(r"[^\s]", line) is not None
+
 # vulnerable C functions, source: rats/flawfinder
 VULN_FUNCTIONS = [
     "exec", "system", "gets", "popen", "getenv", "strcpy", "strncpy", "strcat", "strncat",
@@ -566,6 +569,8 @@ def format_disasm_code(code, nearby=None):
 
     for line in code.splitlines():
         if ":" not in line or "Dump of assembler code" in line: # not an assembly line
+            result += line + "\n"
+        elif match_source_line(line):  # source code line
             result += line + "\n"
         else:
             color = style = None
